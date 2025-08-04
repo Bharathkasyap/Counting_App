@@ -1,0 +1,101 @@
+<!--
+  Counting Application
+  ---------------------
+  This is a simple HTML counting app that you can use for chanting mantras or any other counting purpose.
+  It displays the current count, and provides buttons to increment, decrement and reset the count.
+  The current count is stored in localStorage so that it persists across page reloads.
+-->
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <!-- Set the title shown on the browser tab -->
+    <title>Counting App</title>
+    <!-- Internal CSS styles to layout the page nicely -->
+    <style>
+      /* Use a clean sans‑serif font and center the content */
+      body {
+        font-family: Arial, sans-serif;
+        text-align: center;
+        margin-top: 50px;
+      }
+      /* Style the header */
+      h1 {
+        font-size: 2rem;
+        margin-bottom: 20px;
+      }
+      /* Style the display area for the count */
+      #count {
+        font-size: 3rem;
+        margin: 20px;
+      }
+      /* Style all buttons consistently */
+      button {
+        margin: 10px;
+        padding: 10px 20px;
+        font-size: 1rem;
+        cursor: pointer;
+      }
+
+      /* Button bar to position the decrement, reset and increment buttons */
+      #button-bar {
+        display: flex;              /* lay out children in a row */
+        justify-content: space-around; /* place generous space around each button */
+        align-items: center;        /* center buttons vertically within the bar */
+        max-width: 600px;           /* widen the bar so buttons are farther apart */
+        margin: 30px auto;          /* center the bar and add top/bottom margin */
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Heading for the app -->
+    <h1>Counting App</h1>
+    <!-- Element that shows the current count; updated via JavaScript -->
+    <div id="count">0</div>
+    <!-- Container for the three controls. We use flexbox to lay out the buttons horizontally -->
+    <div id="button-bar">
+      <!-- Decrement button on the left with a minus sign -->
+      <button id="decrement">-</button>
+      <!-- Reset button in the center -->
+      <button id="reset">Reset</button>
+      <!-- Increment button on the right with a plus sign -->
+      <button id="increment">+</button>
+    </div>
+
+    <!-- JavaScript to handle the counting logic -->
+    <script>
+      // Read the saved count from localStorage (or default to 0 if none is saved)
+      let count = parseInt(localStorage.getItem('count') || '0', 10);
+      // Get a reference to the DOM element that displays the count
+      const countElement = document.getElementById('count');
+
+      // Function that updates the count display and saves it to localStorage
+      function updateDisplay() {
+        countElement.textContent = count;      // Update the text on the page
+        localStorage.setItem('count', count.toString()); // Persist the current count
+      }
+
+      // Attach a click event to the increment button to increase the count by 1
+      document.getElementById('increment').addEventListener('click', () => {
+        count++;             // Increment the count
+        updateDisplay();     // Refresh the display and save
+      });
+
+      // Attach a click event to the decrement button to decrease the count by 1 (if above zero)
+      document.getElementById('decrement').addEventListener('click', () => {
+        if (count > 0) {
+          count--;           // Decrement only if the count is positive
+          updateDisplay();   // Refresh the display and save
+        }
+      });
+
+      // Attach a click event to the reset button to set the count back to zero
+      document.getElementById('reset').addEventListener('click', () => {
+        count = 0;           // Reset the count
+        updateDisplay();     // Refresh the display and save
+      });
+
+      // Immediately update the display when the page loads
+      updateDisplay();
+    </script>
+  </body>
+</html>
