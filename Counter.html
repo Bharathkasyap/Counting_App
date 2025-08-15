@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <title>Counting App with Goal, Alert, Chime & Vibration</title>
+  <title>Counting App with Goal, Chime & Vibration</title>
   <style>
     html, body {
       height: 100%;
@@ -72,15 +72,14 @@
       localStorage.setItem('count', count.toString());
     }
 
-    function triggerAlert() {
+    function playChime() {
       if (chimeSound) {
         chimeSound.currentTime = 0;
         chimeSound.play().catch(err => console.log("Audio play error:", err));
       }
       if (navigator.vibrate) {
-        navigator.vibrate([500, 200, 500]); // Longer vibration pattern
+        navigator.vibrate([500, 200, 500]);
       }
-      window.alert("Goal reached! Count: " + count);
     }
 
     function incrementCount() {
@@ -88,7 +87,7 @@
       updateDisplay();
       let goal = parseInt(goalInput.value, 10);
       if (goal && count >= goal) {
-        triggerAlert();
+        playChime();
       }
     }
 
