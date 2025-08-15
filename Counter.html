@@ -1,103 +1,116 @@
-<!--
-  Counting Application
-  ---------------------
-  This is a simple HTML counting app that you can use for chanting mantras or any other counting purpose.
-  It displays the current count, and provides buttons to increment, decrement and reset the count.
-  The current count is stored in localStorage so that it persists across page reloads.
--->
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <!-- Set the title shown on the browser tab -->
-    <title>Counting App</title>
-    <!-- Internal CSS styles to layout the page nicely -->
-    <style>
-      /* Use a clean sans‑serif font and center the content */
-      body {
-        font-family: Arial, sans-serif;
-        text-align: center;
-        margin-top: 50px;
-      }
-      /* Style the header */
-      h1 {
-        font-size: 5rem;
-        margin-bottom: 30px;
-      }
-      /* Style the display area for the count */
-      #count {
-        font-size: 5rem;
-        margin: 30px;
-      }
-      /* Style all buttons consistently */
-      button {
-        margin: 10px;
-        padding: 20px 40px;
-        font-size: 4rem;
-        cursor: pointer;
-      }
+<head>
+  <title>Counting App with Goal & Chime</title>
+  <style>
+    html, body {
+      height: 100%;
+      margin: 0;
+    }
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      user-select: none;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+    h1 {
+      font-size: 3rem;
+      margin-bottom: 20px;
+    }
+    #count {
+      font-size: 4rem;
+      margin: 20px;
+    }
+    button, input {
+      margin: 10px;
+      padding: 15px 25px;
+      font-size: 1.5rem;
+      cursor: pointer;
+    }
+    #button-bar {
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+      max-width: 500px;
+      width: 100%;
+      margin: 20px auto;
+    }
+  </style>
+</head>
+<body>
+  <h1>Counting App</h1>
 
-      /* Button bar to position the decrement, reset and increment buttons */
-      #button-bar {
-        display: flex;              /* lay out children in a row */
-        justify-content: space-around; /* place generous space around each button */
-        align-items: center;        /* center buttons vertically within the bar */
-        max-width: 600px;           /* widen the bar so buttons are farther apart */
-        margin: 30px auto;          /* center the bar and add top/bottom margin */
-      }
-    </style>
-  </head>
-  <body>
-    <!-- Heading for the app -->
-    <h1>Counting App</h1>
-    <!-- Element that shows the current count; updated via JavaScript -->
-    <br>
-      </br>
-    <div id="count">0</div>
-    <!-- Container for the three controls. We use flexbox to lay out the buttons horizontally -->
-    <div id="button-bar">
-      <!-- Decrement button on the left with a minus sign -->
-      <button id="decrement">-</button>
-      <!-- Reset button in the center -->
-      <button id="reset">Reset</button>
-      <!-- Increment button on the right with a plus sign -->
-      <button id="increment">+</button>
-    </div>
+  <div>
+    <label for="goal">Set Goal:</label>
+    <input type="number" id="goal" placeholder="Enter goal" min="1">
+  </div>
 
-    <!-- JavaScript to handle the counting logic -->
-    <script>
-      // Read the saved count from localStorage (or default to 0 if none is saved)
-      let count = parseInt(localStorage.getItem('count') || '0', 10);
-      // Get a reference to the DOM element that displays the count
-      const countElement = document.getElementById('count');
+  <div id="count">0</div>
 
-      // Function that updates the count display and saves it to localStorage
-      function updateDisplay() {
-        countElement.textContent = count;      // Update the text on the page
-        localStorage.setItem('count', count.toString()); // Persist the current count
-      }
+  <div id="button-bar">
+    <button id="decrement">-</button>
+    <button id="reset">Reset</button>
+    <button id="increment">+</button>
+  </div>
 
-      // Attach a click event to the increment button to increase the count by 1
-      document.getElementById('increment').addEventListener('click', () => {
-        count++;             // Increment the count
-        updateDisplay();     // Refresh the display and save
-      });
+  <audio id="chime" src="https://www.soundjay.com/buttons/sounds/button-09.mp3" preload="auto"></audio>
 
-      // Attach a click event to the decrement button to decrease the count by 1 (if above zero)
-      document.getElementById('decrement').addEventListener('click', () => {
-        if (count > 0) {
-          count--;           // Decrement only if the count is positive
-          updateDisplay();   // Refresh the display and save
-        }
-      });
+  <script>
+    let count = parseInt(localStorage.getItem('count') || '0', 10);
+    const countElement = document.getElementById('count');
+    const goalInput = document.getElementById('goal');
+    const chimeSound = document.getElementById('chime');
 
-      // Attach a click event to the reset button to set the count back to zero
-      document.getElementById('reset').addEventListener('click', () => {
-        count = 0;           // Reset the count
-        updateDisplay();     // Refresh the display and save
-      });
+    goalInput.value = localStorage.getItem('goal') || '';
+    goalInput.addEventListener('input', () => {
+      localStorage.setItem('goal', goalInput.value);
+    });
 
-      // Immediately update the display when the page loads
+    function updateDisplay() {
+      countElement.textContent = count;
+      localStorage.setItem('count', count.toString());
+    }
+
+    function incrementCount() {
+      count++;
       updateDisplay();
-    </script>
-  </body>
+
+      let goal = parseInt(goalInput.value, 10);
+      if (goal && count >= goal) {
+        chimeSound.currentTime = 0;
+        chimeSound.play().catch(err => console.log("Sound blocked:", err));
+      }
+    }
+
+    document.addEventListener('click', (event) => {
+      if (event.target.tagName !== 'INPUT') {
+        incrementCount();
+      }
+    });
+
+    document.getElementById('increment').addEventListener('click', (e) => {
+      e.stopPropagation();
+      incrementCount();
+    });
+
+    document.getElementById('decrement').addEventListener('click', (e) => {
+      e.stopPropagation();
+      if (count > 0) {
+        count--;
+        updateDisplay();
+      }
+    });
+
+    document.getElementById('reset').addEventListener('click', (e) => {
+      e.stopPropagation();
+      count = 0;
+      updateDisplay();
+    });
+
+    updateDisplay();
+  </script>
+</body>
 </html>
