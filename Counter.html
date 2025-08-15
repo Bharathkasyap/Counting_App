@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <title>Counting App with Goal, Chime & Vibration</title>
+  <title>Counting App with Goal, Alert, Chime & Vibration</title>
   <style>
     html, body {
       height: 100%;
@@ -22,8 +22,8 @@
     }
     button, input {
       margin: 10px;
-      padding: 30px 50px; /* Extra large buttons */
-      font-size: 3rem; /* Extra large font */
+      padding: 30px 50px;
+      font-size: 3rem;
       cursor: pointer;
     }
     #button-bar {
@@ -51,7 +51,10 @@
     <button id="increment">+</button>
   </div>
 
-  <audio id="chime" src="https://www.soundjay.com/button/beep-07.wav" preload="auto"></audio>
+  <!-- Local sound file included in the same folder -->
+  <audio id="chime" preload="auto">
+    <source src="./goal-reached.mp3" type="audio/mpeg">
+  </audio>
 
   <script>
     let count = parseInt(localStorage.getItem('count') || '0', 10);
@@ -70,28 +73,25 @@
     }
 
     function triggerAlert() {
-      try {
+      if (chimeSound) {
         chimeSound.currentTime = 0;
-        chimeSound.play();
-      } catch (err) {
-        console.log("Sound play issue:", err);
+        chimeSound.play().catch(err => console.log("Audio play error:", err));
       }
       if (navigator.vibrate) {
-        navigator.vibrate([300, 100, 300]); // Vibrate pattern: vibrate 300ms, pause 100ms, vibrate 300ms
+        navigator.vibrate([500, 200, 500]); // Longer vibration pattern
       }
+      window.alert("Goal reached! Count: " + count);
     }
 
     function incrementCount() {
       count++;
       updateDisplay();
-
       let goal = parseInt(goalInput.value, 10);
       if (goal && count >= goal) {
         triggerAlert();
       }
     }
 
-    // Increment anywhere except input fields
     document.addEventListener('click', (event) => {
       if (event.target.tagName !== 'INPUT') {
         incrementCount();
