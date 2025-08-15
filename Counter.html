@@ -51,10 +51,9 @@
     <button id="increment">+</button>
   </div>
 
-  <!-- Use a direct reliable online sound URL as fallback -->
+  <!-- Local sound file included in the same folder -->
   <audio id="chime" preload="auto">
-    <source src="https://github.com/Bharathkasyap/Counting_App/blob/main/goal-reached.mp3" type="audio/mpeg">
-    <source src="https://www.soundjay.com/button/beep-07.wav" type="audio/wav">
+    <source src="./goal-reached.mp3" type="audio/mpeg">
   </audio>
 
   <script>
@@ -62,11 +61,6 @@
     const countElement = document.getElementById('count');
     const goalInput = document.getElementById('goal');
     const chimeSound = document.getElementById('chime');
-
-    // Log load errors for debugging
-    chimeSound.addEventListener('error', () => {
-      console.log('Audio failed to load. Check file path or permissions.');
-    });
 
     goalInput.value = localStorage.getItem('goal') || '';
     goalInput.addEventListener('input', () => {
@@ -81,9 +75,7 @@
     function playChime() {
       if (chimeSound) {
         chimeSound.currentTime = 0;
-        chimeSound.play().then(() => {
-          console.log('Chime played');
-        }).catch(err => console.log("Audio play error:", err));
+        chimeSound.play().catch(err => console.log("Audio play error:", err));
       }
       if (navigator.vibrate) {
         navigator.vibrate([500, 200, 500]);
